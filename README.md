@@ -27,6 +27,5 @@ El ambiente necesita dos imagenes para correr la aplicacion:  Una base de datos 
  Finalmente, este comando levantara la aplicacion en el puerto 5000
  
  ```
-docker run --name airline -p5000:5000 --link postgres-flask -e DATABASE_URL=postgres://root:test1234@postgres-flask/flights -
-e FLASK_APP=application.py airline
+docker run --name airline -p5000:5000 --link postgres-flask -e DATABASE_URL=postgres://root:test1234@postgres-flask/flights -e FLASK_APP=application.py airline
 ```
