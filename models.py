@@ -14,10 +14,23 @@ class Flight(db.Model):
     duration = db.Column(db.Integer, nullable=False)
     passengers = db.relationship("Passenger", backref="flight", lazy=True)
 
+    def __init__(self, flight_origin, flight_destination, flight_duration):
+        self.origin = flight_origin
+        self.destination = flight_destination
+        self.duration = flight_duration
+
     def add_passenger(self, name):
         p = Passenger(name=name, flight_id=self.id)
         db.session.add(p)
         db.session.commit()
+        db.session.refresh(p)
+        return p.id
+
+    def add_flight(self):
+        db.session.add(self)
+        db.session.commit()
+        db.session.refresh(self)
+        return self.id
 
 
 class Passenger(db.Model):
