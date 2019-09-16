@@ -62,7 +62,7 @@ def flight(flight_id):
     # return render_template("flight.html", flight=flight, passengers=passengers)
 
 
-@app.route("/api/flights/<int:flight_id>")
+@app.route("/api/flights/<int:flight_id>", methods=['GET'])
 def flight_api(flight_id):
     """Return details about a single flight."""
 
@@ -82,3 +82,37 @@ def flight_api(flight_id):
             "duration": flight.duration,
             "passengers": names
         })
+
+@app.route("/api/booking/new", methods=['POST'])
+def api_book_flight():
+    name = request.json['name']
+    flight_id = request.json['flight_id']
+    #Make sure the flight exists
+    flight = Flight.query.get(flight_id)
+    if not flight:
+        return jsonify({"error": "No such flight id"})
+    reservation_id = flight.add_passenger(name)
+
+    return jsonify({
+            "origin": flight.origin,
+            "destination": flight.destination,
+            "duration": flight.duration,
+            "name": name,
+            "reservation_id": reservation_id
+    })
+
+@app.route("/api/flights/new", methods=["POST"])
+def api_create_flight():
+    origin = request.json['origin']
+    destination = request.json['destination']
+    duration = request.json['duration']
+
+    flight = Flight(origin, destination, duration)
+    flight_id = flight.add_flight()
+
+    return jsonify({
+        "flight_id": flight_id,
+        "origin": origin,
+        "destination": destination,
+        "duration": duration
+    })
