@@ -83,7 +83,30 @@ def flight_api(flight_id):
             "passengers": names
         })
 
-@app.route("/api/booking/new", methods=['POST'])
+@app.route("/api/reservations/<int:reservation_id>", methods=['GET'])
+def reservations_api(reservation_id):
+    """Return details about a reservation flight."""
+
+    # Make sure flight exists.
+    reservation = Passenger.query.get(reservation_id)
+
+    if reservation is None:
+        return jsonify({"error": "Invalid reservation_id"}), 422
+
+    flight_info = Flight.query.get(reservation.flight_id)
+
+    if flight_info is None:
+        return jsonify({"error": "Invalid flight_id: {reservation.flight_id}"}), 422
+    # return flight reservation info
+    return jsonify({
+            "origin": flight_info.origin,
+            "destination": flight_info.destination,
+            "duration": flight_info.duration,
+            "passenger": reservation.name,
+            "reservation_id": reservation.id
+        })
+
+@app.route("/api/reservation/new", methods=['POST'])
 def api_book_flight():
     name = request.json['name']
     flight_id = request.json['flight_id']
@@ -101,7 +124,7 @@ def api_book_flight():
             "reservation_id": reservation_id
     })
 
-@app.route("/api/flights/new", methods=["POST"])
+@app.route("/api/flight/new", methods=["POST"])
 def api_create_flight():
     origin = request.json['origin']
     destination = request.json['destination']
