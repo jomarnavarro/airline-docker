@@ -61,11 +61,15 @@ def flight(flight_id):
     # passengers = flight.passengers
     # return render_template("flight.html", flight=flight, passengers=passengers)
 
+@app.route("/api/flights/", methods=['GET'])
+def flight_api_no_flight_id():
+    return jsonify({"error": "No flight id was specified."}), 500
 
 @app.route("/api/flights/<int:flight_id>", methods=['GET'])
 def flight_api(flight_id):
     """Return details about a single flight."""
-
+    if check_int_data_type(flight_id) != 0:
+        return jsonify({"error", "flight_id is in wrong format."}), 500
     # Make sure flight exists.
     flight = Flight.query.get(flight_id)
     if flight is None:
@@ -83,10 +87,38 @@ def flight_api(flight_id):
             "passengers": names
         })
 
+def check_string_data_type(string_data):
+    print('Hello world!')
+    print(string_data)
+    print(isinstance(string_data, type(str)))
+    if isinstance(string_data, type(str)):
+        return 1
+    if string_data == '':
+        return 1
+    try:
+        integ = int(string_data)
+        return 1
+    except:
+        return 0
+    return 0
+
+def check_int_data_type(int_data):
+    if isinstance(int_data, type(int)):
+        return 0
+    try:
+        integ = int(int_data)
+        return 0
+    except:
+        return 1
+
+
 @app.route("/api/reservations/<int:reservation_id>", methods=['GET'])
 def reservations_api(reservation_id):
     """Return details about a reservation flight."""
-
+    # make sure reservation_id has the correct data type
+    if check_int_data_type(reservation_id) != 0:
+        return jsonify({"error", "reservation_id is in wrong format."}), 500
+    
     # Make sure flight exists.
     reservation = Passenger.query.get(reservation_id)
 
@@ -109,7 +141,11 @@ def reservations_api(reservation_id):
 @app.route("/api/reservation/new", methods=['POST'])
 def api_book_flight():
     name = request.json['name']
+    if check_string_data_type(name) == 1:
+        return jsonify({"error": "Passenger name is invalid"}), 400
     flight_id = request.json['flight_id']
+    if check_int_data_type(flight_id) == 1:
+        return jsonify({"error": "Flight id is invalid"}), 400
     #Make sure the flight exists
     flight = Flight.query.get(flight_id)
     if not flight:
@@ -127,9 +163,17 @@ def api_book_flight():
 @app.route("/api/flight/new", methods=["POST"])
 def api_create_flight():
     origin = request.json['origin']
+    if check_string_data_type(origin) == 1:
+        return jsonify({"error": "Origin is invalid"}), 400
+    
     destination = request.json['destination']
-    duration = request.json['duration']
-
+    if check_string_data_type(destination) == 1:
+        return jsonify({"error": "Destination is invalid"}), 400
+    
+    duration = int(request.json['duration'])
+    if check_int_data_type(duration) == 1:
+        return jsonify({"error": "Duration is invalid"}), 400
+    
     flight = Flight(origin, destination, duration)
     flight_id = flight.add_flight()
 
