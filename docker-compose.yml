@@ -1,0 +1,25 @@
+version: "3"
+services:
+    postgres-flask:
+        image: postgres-flask
+        container_name: postgres-flask
+        ports:
+            - "5432:5432"
+        environment:
+            - POSTGRES_USER=root
+            - POSTGRES_PASSWORD=test1234
+    airline:
+        image: airline
+        container_name: airline
+        ports: 
+            - "5000:5000"
+        environment: 
+            - DATABASE_URL=postgres://root:test1234@postgres-flask/flights
+            - FLASK_APP=application.py
+        restart: always
+        healthcheck:
+            test: healthcheck.sh
+            interval: 2s
+            start_period: 5s
+        depends_on: 
+            - postgres-flask

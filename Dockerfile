@@ -1,12 +1,6 @@
-FROM ubuntu:latest
+FROM python:3.8.11-alpine3.14
 
-ARG DEBIAN_FRONTEND=noninteractive
-RUN apt-get update -y \
-  && apt-get install -y python3-pip python3-dev postgresql postgresql-contrib libpq-dev \
-  && apt-get install -y python-psycopg2 \
-  && cd /usr/local/bin \
-  && ln -s /usr/bin/python3 python \
-  && pip3 install --upgrade pip
+RUN apk update && apk add postgresql-dev gcc python3-dev musl-dev
 
 ENV LC_ALL=C.UTF-8
 ENV LANG=C.UTF-8
